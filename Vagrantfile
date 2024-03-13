@@ -48,6 +48,20 @@ Vagrant.configure("2") do |config|
               vb.customize ["modifyvm", :id, "--memory", 512]
               vb.customize ["modifyvm", :id, "--cpus", 1]
           end
+          
+          # Install Docker
+          if machine[:hostname] == "master"
+              node.vm.provision "shell", inline: <<-SHELL
+              sudo apt-get update
+              sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+              sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+              sudo apt-get updat
+              sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+              # Add vagrant user to docker group
+              sudo usermod -aG docker vagrant
+            SHELL
+          end
       end
   end
 end
